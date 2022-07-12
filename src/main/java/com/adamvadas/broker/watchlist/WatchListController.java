@@ -1,6 +1,7 @@
 package com.adamvadas.broker.watchlist;
 
 import com.adamvadas.broker.data.InMemoryAccountStore;
+import io.micronaut.http.HttpResponse;
 import io.micronaut.http.HttpStatus;
 import io.micronaut.http.MediaType;
 import io.micronaut.http.annotation.*;
@@ -22,9 +23,9 @@ public record WatchListController(InMemoryAccountStore store) {
         return store.updateWatchList(ACCOUNT_ID, watchList);
     }
 
-    @Status(HttpStatus.NO_CONTENT)
     @Delete(produces = MediaType.APPLICATION_JSON)
-    public void deleteWatchList() {
+    public HttpResponse<Void> deleteWatchList() {
         store.deleteWatchList(ACCOUNT_ID);
+        return HttpResponse.noContent();
     }
 }
