@@ -1,9 +1,12 @@
 package com.adamvadas.broker.data;
 
+import com.adamvadas.broker.wallet.DepositFiatMoney;
 import com.adamvadas.broker.wallet.Wallet;
+import com.adamvadas.broker.wallet.WithDrawFiatMoney;
 import com.adamvadas.broker.watchlist.WatchList;
 import jakarta.inject.Singleton;
 
+import java.math.BigDecimal;
 import java.util.*;
 
 @Singleton
@@ -30,5 +33,46 @@ public class InMemoryAccountStore {
         return Optional.ofNullable(walletsPerAccount.get(accountId))
                 .orElse(new HashMap<>())
                 .values();
+    }
+
+    public Wallet depositToWallet(DepositFiatMoney deposit)
+    {
+        final var wallets = Optional.ofNullable(
+                walletsPerAccount.get(deposit.accountId())
+        ).orElse(
+                new HashMap<>()
+        );
+
+        var oldWallet = Optional.ofNullable(
+                wallets.get(deposit.walletId()))
+                .orElse(
+                        new Wallet(ACCOUNT_ID, deposit.walletId(), deposit.symbol(), BigDecimal.ZERO, BigDecimal.ZERO)
+                );
+
+        var newWallet = oldWallet.addAvailable(deposit.amount());
+
+        // Update wallet in store
+        wallets.put(newWallet.walletId(), newWallet);
+        walletsPerAccount.put(newWallet.accountId(), wallets);
+
+        return newWallet;
+    }
+
+    public Wallet withdrawFromWallet(WithDrawFiatMoney withdraw)
+    {
+        final var wallets = Optional.ofNullable(
+                walletsPerAccount.get(withdraw.accountId())
+        ).orElse(
+                new HashMap<>()
+        );
+
+        var oldWallet = wallets.get(withdraw.accountId());
+        var newWallet = oldWallet.withdraw(withdraw.amount());
+
+        // Update wallet in store
+        wallets.put(newWallet.walletId(), newWallet);
+        walletsPerAccount.put(newWallet.accountId(), wallets);
+
+        return newWallet;
     }
 }
