@@ -12,6 +12,8 @@ repositories {
 
 dependencies {
     annotationProcessor("io.micronaut:micronaut-http-validation")
+    implementation("io.micronaut.security:micronaut-security-jwt")
+    compileOnly("io.micronaut.security:micronaut-security-annotations")
     implementation("io.micronaut:micronaut-http-client")
     implementation("io.micronaut:micronaut-jackson-databind")
     implementation("jakarta.annotation:jakarta.annotation-api")
@@ -19,7 +21,6 @@ dependencies {
     implementation("io.micronaut:micronaut-validation")
     implementation ('com.github.javafaker:javafaker:1.0.2') { exclude module: 'snakeyaml' }
 }
-
 
 application {
     mainClass.set("com.adamvadas.Application")
